@@ -1,0 +1,70 @@
+import argparse
+import os
+import importlib
+import ast
+import sys
+from pathlib import Path
+from interfaces import *
+
+
+parser = argparse.ArgumentParser(prog="Interpreter")
+parser.add_argument("-tc", "--transcriber", default="vosk")
+parser.add_argument("-tl", "--translator", default="passthrough")
+parser.add_argument("-d", "--display", default="terminal", help="Choose a different way of displaying text")
+parser.add_argument("-l", "--list", action="store_true", help="List all plugins and terminate")
+args = parser.parse_args()
+
+def plugin_info(plugin):
+	tree = ast.parse(Path(plugin).read_text())
+	for node in ast.walk(tree):
+		if isinstance(node, ast.ClassDef):
+			for statement in node.body:
+				if (
+					isinstance(statement, ast.Assign) 
+					and statement.targets[0].id == "description"
+				):
+					return statement.value.value
+
+if args.list:
+	print("\033[1mTranscribers\033[0m")
+	for plugin in os.listdir("transcriber"):
+		if plugin.endswith(".py"):
+			print(" \033[1mName:\033[0m", plugin)
+			print(" \033[1mDescription:\033[0m", plugin_info("transcriber/" + plugin))
+			print()
+	
+	print("\033[1mTranslators\033[0m")
+	for plugin in os.listdir("translator"):
+		if plugin.endswith(".py"):
+			print(" \033[1mName:\033[0m", plugin)
+			print(" \033[1mDescription:\033[0m", plugin_info("translator/" + plugin))
+			print()
+
+	print("\033[1mFrontends\033[0m")
+	for plugin in os.listdir("front"):
+		if plugin.endswith(".py"):
+			print(" \033[1mName:\033[0m", plugin)
+			print(" \033[1mDescription:\033[0m", plugin_info("front/" + plugin))
+			print()
+
+	sys.exit()
+
+#TODO: better Dependency Injection (maybe with the init?)
+print("\033[1mInitializing Transcriber\033[0m")
+ts_import = importlib.import_module("transcriber." + args.transcriber)
+ts_model = Transcriber.__subclasses__()[0]()
+print("\033[1mInitializing Translator\033[0m")
+tl_import = importlib.import_module("translator." + args.translator)
+tl_engine = Translator.__subclasses__()[0]()
+print("\033[1mInitializing Player\033[0m")
+ft_import = importlib.import_module("front." + args.display)
+ft_player = Player.__subclasses__()[0]()
+
+ts_model.sourceChoose()
+while True:
+	transcribed = ts_model.finalText()
+	if transcribed != "":
+		translated = tl_engine.translate(transcribed)
+		ft_player.send_text(translated)
+
+#ftPlayer.disconnect()
