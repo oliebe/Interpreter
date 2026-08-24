@@ -3,6 +3,7 @@ from groq import Groq
 
 class IGroq(Translator):
 	description = "Uses Groq models for translation. Fine-tuned for transcription error correction and grammar fixing. Needs an API key."
+	depends = "groq"
 
 	def __init__(self):
 		self.client = Groq()

@@ -6,6 +6,7 @@ import json
 
 class VoskTranscriber(Transcriber):
 	description = "Vosk Offline Speech to Text. Supports more than 20 languages and very lightweight."
+	depends = "vosk, sounddevice"
 	def __init__(self):
 		self.description = {
 				"test": "abc123"

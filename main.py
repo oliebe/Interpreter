@@ -1,3 +1,4 @@
+#!/bin/python
 import argparse
 import os
 import importlib
@@ -8,46 +9,59 @@ from interfaces import *
 
 
 parser = argparse.ArgumentParser(prog="Interpreter")
-parser.add_argument("-tc", "--transcriber", default="vosk")
-parser.add_argument("-tl", "--translator", default="passthrough")
-parser.add_argument("-d", "--display", default="terminal", help="Choose a different way of displaying text")
-parser.add_argument("-l", "--list", action="store_true", help="List all plugins and terminate")
+parser.add_argument("-tc", "--transcriber", 
+					default="vosk", 
+					help="Choose the transcribing engine")
+parser.add_argument("-tl", "--translator", 
+					default="passthrough", 
+					help="Choose the translation engine")
+parser.add_argument("-d", "--display", 
+					default="terminal", 
+					help="Choose a different way of displaying text")
+parser.add_argument("-l", "--list", 
+					action="store_true", 
+					help="List all plugins and terminate")
 args = parser.parse_args()
 
-def plugin_info(plugin):
+
+# plugin_info: retrieves metadata about a given plugin (description, dependencies)
+#	plugin: the plugin name
+#	info_type: the name of a variable containing metadata
+def plugin_info(plugin, info_type):
 	tree = ast.parse(Path(plugin).read_text())
 	for node in ast.walk(tree):
 		if isinstance(node, ast.ClassDef):
 			for statement in node.body:
 				if (
 					isinstance(statement, ast.Assign) 
-					and statement.targets[0].id == "description"
+					and statement.targets[0].id == info_type
 				):
 					return statement.value.value
 
+
+# plugin_list: lists all available plugins in a category, along with their metadata
+#	plugin_type: the category to list (transcriber, translator, front)
+def plugin_list(plugin_type):
+	for plugin in os.listdir(plugin_type):
+		if plugin.endswith(".py"):
+			path = plugin_type + "/" + plugin
+			print(" \033[1mName:\033[0m", plugin)
+			print(" \033[1mDescription:\033[0m", plugin_info(path, "description"))
+			print(" \033[1mDependencies:\033[0m", plugin_info(path, "depends"))
+			print()
+
 if args.list:
 	print("\033[1mTranscribers\033[0m")
-	for plugin in os.listdir("transcriber"):
-		if plugin.endswith(".py"):
-			print(" \033[1mName:\033[0m", plugin)
-			print(" \033[1mDescription:\033[0m", plugin_info("transcriber/" + plugin))
-			print()
-	
+	plugin_list("transcriber")
+
 	print("\033[1mTranslators\033[0m")
-	for plugin in os.listdir("translator"):
-		if plugin.endswith(".py"):
-			print(" \033[1mName:\033[0m", plugin)
-			print(" \033[1mDescription:\033[0m", plugin_info("translator/" + plugin))
-			print()
+	plugin_list("translator")
 
 	print("\033[1mFrontends\033[0m")
-	for plugin in os.listdir("front"):
-		if plugin.endswith(".py"):
-			print(" \033[1mName:\033[0m", plugin)
-			print(" \033[1mDescription:\033[0m", plugin_info("front/" + plugin))
-			print()
+	plugin_list("front")
 
 	sys.exit()
+
 
 #TODO: better Dependency Injection (maybe with the init?)
 print("\033[1mInitializing Transcriber\033[0m")

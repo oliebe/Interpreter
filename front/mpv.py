@@ -4,6 +4,7 @@ import json
 
 class MPVPlayer(Player):
 	description = "Send text to mpv screen. Mpv needs to already be running with an open socket."
+	depends = "mpv"
 	def __init__(self, ipc_path="/tmp/mpvsocket"):
 		self.ipc_path = ipc_path
 		self.sock = None

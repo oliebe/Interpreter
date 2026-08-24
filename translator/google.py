@@ -7,6 +7,7 @@ except ImportError:
 
 class IGoogleTranslator(Translator):
 	description = "Uses Google Translate API. Not precise and carries transcription errors on."
+	depends = "deep_translator"
 	def translate(self, string) -> str:
 		return GoogleTranslator(source="auto", target="pt").translate(text=string)
 
