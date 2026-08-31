@@ -15,6 +15,11 @@ class IGroq(Translator):
 			]
 	def translate(self, string):
 		self.messages.append({"role": "user", "content": string})
+
+		if len(self.messages) > 6:
+			self.messages.pop(1)
+			self.messages.pop(1)
+
 		completion = self.client.chat.completions.create(
 			model="openai/gpt-oss-120b",
 			messages=self.messages,
@@ -25,6 +30,7 @@ class IGroq(Translator):
 			stream=False,
 			stop=None
 		)
+
+		self.messages.append({"role": "assistant", "content": completion.choices[0].message.content})
 		return completion.choices[0].message.content
 	#TODO: stream text
-	#TODO: input rotation and backfeeding the ai output
