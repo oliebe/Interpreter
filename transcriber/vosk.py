@@ -7,19 +7,20 @@ import json
 class VoskTranscriber(Transcriber):
 	description = "Vosk Offline Speech to Text. Supports more than 20 languages and very lightweight."
 	depends = "vosk, sounddevice"
-	def __init__(self):
-		self.description = {
-				"test": "abc123"
-				}
+	def __init__(self, args):
+		self.args = args
 		self.model = Model("model")
 		self.sample_rate = 16000
 		self.audio_queue = queue.Queue()
 		self.device = sd.default.device
-	
+
+		#TODO: probably create a configuration spec for these kinds of function
+		self.source_choose()
+		
 	def audio_callback(self, indata, frames, time_info, status):
 		self.audio_queue.put(bytes(indata))
 
-	def finalText(self):
+	def final_text(self):
 		self.stream = sd.RawInputStream(
 			samplerate=self.sample_rate,
 			blocksize=0,
@@ -40,13 +41,14 @@ class VoskTranscriber(Transcriber):
 				except queue.Empty:
 					continue
 
-	def sourceChoose(self):
+	def source_choose(self):
 		print(sd.query_devices())
 		dev = int(input("Choose your device: "))
 		if dev != -1:
 			sd.default.device = dev
 			self.sample_rate = sd.query_devices(dev)["default_samplerate"]
 			#print(self.sample_rate)
-
-
-
+	
+	@staticmethod
+	def make_arguments(parser: ArgumentParser):
+		parser.add_argument("-tcl", help="Vosk: Choose the transcribing language")

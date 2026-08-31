@@ -8,22 +8,6 @@ from pathlib import Path
 from interfaces import *
 
 
-parser = argparse.ArgumentParser(prog="Interpreter")
-parser.add_argument("-tc", "--transcriber", 
-					default="vosk", 
-					help="Choose the transcribing engine")
-parser.add_argument("-tl", "--translator", 
-					default="passthrough", 
-					help="Choose the translation engine")
-parser.add_argument("-d", "--display", 
-					default="terminal", 
-					help="Choose a different way of displaying text")
-parser.add_argument("-l", "--list", 
-					action="store_true", 
-					help="List all plugins and terminate")
-args = parser.parse_args()
-
-
 # plugin_info: retrieves metadata about a given plugin (description, dependencies)
 #	plugin: the plugin name
 #	info_type: the name of a variable containing metadata
@@ -50,35 +34,66 @@ def plugin_list(plugin_type):
 			print(" \033[1mDependencies:\033[0m", plugin_info(path, "depends"))
 			print()
 
-if args.list:
-	print("\033[1mTranscribers\033[0m")
-	plugin_list("transcriber")
 
-	print("\033[1mTranslators\033[0m")
-	plugin_list("translator")
+def main():
+	parser = argparse.ArgumentParser(prog="Interpreter", add_help=False)
+	parser.add_argument("-tc", "--transcriber", 
+						default="vosk", 
+						help="Choose the transcribing engine")
+	parser.add_argument("-tl", "--translator", 
+						default="groq", 
+						help="Choose the translation engine")
+	parser.add_argument("-d", "--display", 
+						default="terminal", 
+						help="Choose a different way of displaying text")
+	parser.add_argument("-l", "--list", 
+						action="store_true", 
+						help="List all plugins and terminate")
+	parser.add_argument("-h", "--help",
+						action="store_true")
+	args = parser.parse_known_args()[0]
 
-	print("\033[1mFrontends\033[0m")
-	plugin_list("front")
 
-	sys.exit()
+	if args.list:
+		print("\033[1mTranscribers\033[0m")
+		plugin_list("transcriber")
 
+		print("\033[1mTranslators\033[0m")
+		plugin_list("translator")
 
-#TODO: better Dependency Injection (maybe with the init?)
-print("\033[1mInitializing Transcriber\033[0m")
-ts_import = importlib.import_module("transcriber." + args.transcriber)
-ts_model = Transcriber.__subclasses__()[0]()
-print("\033[1mInitializing Translator\033[0m")
-tl_import = importlib.import_module("translator." + args.translator)
-tl_engine = Translator.__subclasses__()[0]()
-print("\033[1mInitializing Player\033[0m")
-ft_import = importlib.import_module("front." + args.display)
-ft_player = Player.__subclasses__()[0]()
+		print("\033[1mFrontends\033[0m")
+		plugin_list("front")
 
-ts_model.sourceChoose()
-while True:
-	transcribed = ts_model.finalText()
-	if transcribed != "":
-		translated = tl_engine.translate(transcribed)
-		ft_player.send_text(translated)
+		sys.exit()
 
-#ftPlayer.disconnect()
+	importlib.import_module("transcriber." + args.transcriber)
+	importlib.import_module("translator." + args.translator)
+	importlib.import_module("front." + args.display)
+	
+	# Add arguments from plugins
+	Transcriber.__subclasses__()[0].make_arguments(parser)
+	Translator.__subclasses__()[0].make_arguments(parser)
+	Player.__subclasses__()[0].make_arguments(parser)
+	args = parser.parse_known_args()[0]
+
+	if args.help:
+		parser.print_help()
+		parser.exit()
+
+	#TODO: better Dependency Injection (maybe with the init?)
+	print("\033[1mInitializing Transcriber\033[0m")
+	ts_model = Transcriber.__subclasses__()[0](args)
+	print("\033[1mInitializing Translator\033[0m")
+	tl_engine = Translator.__subclasses__()[0](args)
+	print("\033[1mInitializing Player\033[0m")
+	ft_player = Player.__subclasses__()[0](args)
+
+	while True:
+		transcribed = ts_model.final_text()
+		if transcribed != "":
+			translated = tl_engine.translate(transcribed)
+			ft_player.send_text(translated)
+
+	#ftPlayer.disconnect()
+
+main()
