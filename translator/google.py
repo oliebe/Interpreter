@@ -1,13 +1,16 @@
 from interfaces import Translator
-
-try:
-	from deep_translator import GoogleTranslator
-except ImportError:
-	print("\033[1mError:\033[0m You do not have deep_translator installed")
+from deep_translator import GoogleTranslator
 
 class IGoogleTranslator(Translator):
 	description = "Uses Google Translate API. Not precise and carries transcription errors on."
 	depends = "deep_translator"
-	def translate(self, string) -> str:
+
+	def __init__(self, args):
+		pass
+
+	def translate(self, string):
 		return GoogleTranslator(source="auto", target="pt").translate(text=string)
 
+	@staticmethod
+	def make_arguments(parser):
+		pass
