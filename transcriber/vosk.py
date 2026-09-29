@@ -20,7 +20,7 @@ class VoskTranscriber(Transcriber):
 			sys.exit()
 		#TODO: probably create a configuration spec for these kinds of function
 		self.source_choose()
-		self.model = Model(lang=self.args.tcl or "en-us")
+		self.model = Model(lang=self.args.src or "en-us")
 			
 		
 	def audio_callback(self, indata, frames, time_info, status):
@@ -57,8 +57,6 @@ class VoskTranscriber(Transcriber):
 	
 	@staticmethod
 	def make_arguments(parser: ArgumentParser):
-		parser.add_argument("-tcl", 
-					  help="Vosk: Change the transcribing language (see -tcll output) (default: en-us)")
 		parser.add_argument("-tcll", 
 							help="Vosk: List available languages and terminate",
 							action="store_true")

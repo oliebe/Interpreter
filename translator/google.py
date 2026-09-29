@@ -6,10 +6,12 @@ class IGoogleTranslator(Translator):
 	depends = "deep_translator"
 
 	def __init__(self, args):
+		self.args = args
+		self.translator = GoogleTranslator(source=self.args.src or "auto", target=self.args.tgt)
 		pass
 
 	def translate(self, string):
-		return GoogleTranslator(source="auto", target="pt").translate(text=string)
+		return self.translator.translate(text=string)
 
 	@staticmethod
 	def make_arguments(parser):

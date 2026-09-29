@@ -37,20 +37,26 @@ def plugin_list(plugin_type):
 
 def main():
 	parser = argparse.ArgumentParser(prog="Interpreter", add_help=False)
+	parser.add_argument("-src",
+					 help="Language (code) to translate from",
+					 default="en")
+	parser.add_argument("-tgt",
+					 help="Language (code) to translate to",
+					 default="pt")
 	parser.add_argument("-tc", "--transcriber", 
-						default="vosk", 
-						help="Choose the transcribing engine")
+					 default="vosk", 
+					 help="Choose the transcribing engine")
 	parser.add_argument("-tl", "--translator", 
-						default="groq", 
-						help="Choose the translation engine")
-	parser.add_argument("-d", "--display", 
-						default="terminal", 
-						help="Choose a different way of displaying text")
+					 default="ctranslate2", 
+					 help="Choose the translation engine")
+	parser.add_argument("-ft", "--frontend", 
+					 default="terminal", 
+					 help="Choose a different way of displaying text")
 	parser.add_argument("-l", "--list", 
-						action="store_true", 
-						help="List all plugins and terminate")
+					 action="store_true", 
+					 help="List all plugins and terminate")
 	parser.add_argument("-h", "--help",
-						action="store_true")
+					 action="store_true")
 	args = parser.parse_known_args()[0]
 
 
@@ -68,7 +74,7 @@ def main():
 
 	importlib.import_module("transcriber." + args.transcriber)
 	importlib.import_module("translator." + args.translator)
-	importlib.import_module("front." + args.display)
+	importlib.import_module("front." + args.frontend)
 	
 	# Add arguments from plugins
 	Transcriber.__subclasses__()[0].make_arguments(parser)

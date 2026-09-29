@@ -1,19 +1,22 @@
 from interfaces import Translator
 from groq import Groq
+import langcodes
 
 class IGroq(Translator):
 	#TODO: stream text
-	description = "Uses Groq models for translation. Fine-tuned for transcription error correction and grammar fixing. Needs an API key."
-	depends = "groq"
+	description = "Uses Groq LLM models for translation. Can infer transcription errors and fixes grammar. Needs an API key."
+	depends = "groq, langcodes[data]"
 
 	def __init__(self, args):
 		self.client = Groq()
 		self.args = args
-		self.language = self.args.tll or "Brazilian Portuguese"
+		self.language_from = langcodes.Language.get(self.args.src).display_name()
+		self.language_to = langcodes.Language.get(self.args.tgt).display_name()
+
 		self.messages = [
 			  {
 				"role": "system",
-				"content": "You are a speech interpreter. You will receive unclean strings of text and must fix transcribing errors and grammar, being aware of the given context in previous prompts. After that, you shall translate the text to " + self.language + " and output only the final translated text."
+				"content": "You are a speech interpreter. You will receive unclean strings of text in language \'" + self.language_from + "\' and must fix transcribing errors and grammar, being aware of the given context in previous prompts. After that, you shall translate the text to language \'" + self.language_to + "\' and output only the final translated text."
 			  }
 			]
 
@@ -40,5 +43,5 @@ class IGroq(Translator):
 
 	@staticmethod
 	def make_arguments(parser):
-		parser.add_argument("-tll", help="Groq: Change the translation language. i.e. 'English', 'Spanish', 'Brazilian Portuguese'")
+		pass
 
