@@ -1,13 +1,16 @@
 # Interpreter
 A modular approach to automatic speech interpreters. Choose what engines will transcribe and translate, and even how the captions will be displayed.
 
-Currently in beta stage.
+## Dependencies
+- Requires `python>=3.14`.
+- Vosk requires `vosk` and `sounddevice` packages
+
+Other modules have dependencies highlighted with the option `-l`
 
 ## Usage
 Run `python main.py` for sane defaults, or choose your transcriber, translator, and displayer manually with `-tc`, `-tl`, and `-d`.
 
-### Vosk
-For Vosk to work you must download a model from https://alphacephei.com/vosk/models , extract it in the project folder, and rename the extracted folder to `model`.
+Use `-h` for help (you can see module-specific options by specifying them with `-tc`, `-tl` and `-d`)
 
-### Translation
-Currently Brazilian Portuguese is hardwired in the translation plugins.
+## Contributing
+Contributions are welcome. If you'd like to contribute with a module, see `interfaces.py` for templates. If you want to improve the app, search for `TODO`s scattered through the project or create an Issue.
