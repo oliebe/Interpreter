@@ -1,6 +1,12 @@
 from abc import ABC, abstractmethod
 
 class Transcriber(ABC):
+	def __init__(self, args):
+		self.args = args
+
+	def configure(self):
+		pass
+
 	@abstractmethod
 	def final_text() -> str:
 		pass
@@ -10,23 +16,33 @@ class Transcriber(ABC):
 	#	pass
 
 	@staticmethod
-	@abstractmethod
 	def make_arguments(parser: ArgumentParser) -> None:
 		pass
 
 
 class Translator(ABC):
+	def __init__(self, args):
+		self.args = args
+
+	def configure(self):
+		pass
+
 	@abstractmethod
 	def translate(string) -> str:
 		pass
 
 	@staticmethod
-	@abstractmethod
 	def make_arguments(parser: ArgumentParser) -> None:
 		pass
 
 
 class Player(ABC):
+	def __init__(self, args):
+		self.args = args
+
+	def configure(self):
+		pass
+
 	@abstractmethod
 	def connect():
 		pass
@@ -38,6 +54,5 @@ class Player(ABC):
 		pass
 
 	@staticmethod
-	@abstractmethod
 	def make_arguments(parser: ArgumentParser) -> None:
 		pass

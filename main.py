@@ -87,18 +87,35 @@ def main():
 		parser.exit()
 
 	#TODO: better Dependency Injection (maybe with the init?)
+
+	# Initialization only initializes option-independent things
+	# in other words, it does pre-initialization routines
+	# (like assigning base variables)
+	# Useful for options that print output and terminate
 	print("\033[1mInitializing Transcriber\033[0m")
-	ts_model = Transcriber.__subclasses__()[0](args)
+	tc = Transcriber.__subclasses__()[0](args)
 	print("\033[1mInitializing Translator\033[0m")
-	tl_engine = Translator.__subclasses__()[0](args)
+	tl = Translator.__subclasses__()[0](args)
 	print("\033[1mInitializing Player\033[0m")
-	ft_player = Player.__subclasses__()[0](args)
+	ft = Player.__subclasses__()[0](args)
+
+	# Configuration sets up user configuration and initializes what is needed
+	# to initialize
+	# (like options, and thus starting the module)
+	print("\033[1mConfiguring Transcriber\033[0m")
+	tc.configure()
+	print("\033[1mConfiguring Translator\033[0m")
+	tl.configure()
+	print("\033[1mConfiguring Player\033[0m")
+	ft.configure()
+
+	print("\033[1mStarted successfully\033[0m")
 
 	while True:
-		transcribed = ts_model.final_text()
+		transcribed = tc.final_text()
 		if transcribed != "":
-			translated = tl_engine.translate(transcribed)
-			ft_player.send_text(translated)
+			translated = tl.translate(transcribed)
+			ft.send_text(translated)
 
 	#ftPlayer.disconnect()
 

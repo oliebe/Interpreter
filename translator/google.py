@@ -7,8 +7,9 @@ class IGoogleTranslator(Translator):
 
 	def __init__(self, args):
 		self.args = args
+
+	def configure(self):
 		self.translator = GoogleTranslator(source=self.args.src or "auto", target=self.args.tgt)
-		pass
 
 	def translate(self, string):
 		return self.translator.translate(text=string)

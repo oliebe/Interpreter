@@ -18,10 +18,10 @@ class VoskTranscriber(Transcriber):
 			print("Available Vosk Languages:")
 			list_languages()
 			sys.exit()
-		#TODO: probably create a configuration spec for these kinds of function
+			
+	def configure(self):
 		self.source_choose()
 		self.model = Model(lang=self.args.src or "en-us")
-			
 		
 	def audio_callback(self, indata, frames, time_info, status):
 		self.audio_queue.put(bytes(indata))
