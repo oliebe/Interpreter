@@ -43,14 +43,14 @@ class Player(ABC):
 	def configure(self):
 		pass
 
+	def connect(self):
+		pass
+
 	@abstractmethod
-	def connect():
+	def send_text(self, string, timing):
 		pass
 
-	def send_text(string, timing):
-		pass
-
-	def disconnect():
+	def disconnect(self):
 		pass
 
 	@staticmethod

@@ -5,10 +5,10 @@ class TerminalPlayer(Player):
 	def __init__(self, args):
 		self.args = args
 
-	def connect():
+	def connect(self):
 		return
 
-	def disconnect():
+	def disconnect(self):
 		return
 
 	def send_text(self, string):

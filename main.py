@@ -110,13 +110,20 @@ def main():
 	ft.configure()
 
 	print("\033[1mStarted successfully\033[0m")
+	print("Press CTRL-C to terminate")
 
-	while True:
-		transcribed = tc.final_text()
-		if transcribed != "":
-			translated = tl.translate(transcribed)
-			ft.send_text(translated)
+	try:
+		while True:
+			transcribed = tc.final_text()
+			if transcribed != "":
+				translated = tl.translate(transcribed)
+				ft.send_text(translated)
+	except KeyboardInterrupt:
+		print("Keyboard interrupted, terminating...")
+		# if more modules need a exit function, we might need to make a spec
+		ft.disconnect()
+		sys.exit()
 
-	#ftPlayer.disconnect()
+	return
 
 main()
