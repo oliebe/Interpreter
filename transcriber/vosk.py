@@ -4,10 +4,12 @@ from vosk import Model, KaldiRecognizer, list_languages
 import queue
 import json
 import sys
+import requests
+from langcodes import closest_match
 
 class VoskTranscriber(Transcriber):
 	description = "Vosk Offline Speech to Text. Supports more than 20 languages and very lightweight."
-	depends = "vosk, sounddevice"
+	depends = "vosk, sounddevice, requests, langcodes"
 	def __init__(self, args):
 		self.args = args
 		self.sample_rate = 16000
@@ -21,7 +23,15 @@ class VoskTranscriber(Transcriber):
 			
 	def configure(self):
 		self.source_choose()
-		self.model = Model(lang=self.args.src or "en-us")
+
+		model_list_url = "https://alphacephei.com/vosk/models/model-list.json"
+		response = requests.get(model_list_url)
+		languages = {model["lang"] for model in response.json()}
+		self.lang = closest_match(self.args.src, languages)[0]
+
+		print("\033[1m Selected language:\033[0m", self.lang)
+		self.model = Model(lang=self.lang)
+		
 		
 	def audio_callback(self, indata, frames, time_info, status):
 		self.audio_queue.put(bytes(indata))
