@@ -92,21 +92,21 @@ def main():
 	# in other words, it does pre-initialization routines
 	# (like assigning base variables)
 	# Useful for options that print output and terminate
-	print("\033[1mInitializing Transcriber\033[0m")
+	print("\033[1mInitializing Transcriber\033[0m:", args.transcriber)
 	tc = Transcriber.__subclasses__()[0](args)
-	print("\033[1mInitializing Translator\033[0m")
+	print("\033[1mInitializing Translator\033[0m:", args.translator)
 	tl = Translator.__subclasses__()[0](args)
-	print("\033[1mInitializing Player\033[0m")
+	print("\033[1mInitializing Player\033[0m:", args.frontend)
 	ft = Player.__subclasses__()[0](args)
 
 	# Configuration sets up user configuration and initializes what is needed
 	# to initialize
 	# (like options, and thus starting the module)
-	print("\033[1mConfiguring Transcriber\033[0m")
+	print("\033[1mConfiguring Transcriber\033[0m:", args.transcriber)
 	tc.configure()
-	print("\033[1mConfiguring Translator\033[0m")
+	print("\033[1mConfiguring Translator\033[0m:", args.translator)
 	tl.configure()
-	print("\033[1mConfiguring Player\033[0m")
+	print("\033[1mConfiguring Player\033[0m:", args.frontend)
 	ft.configure()
 
 	print("\033[1mStarted successfully\033[0m")
